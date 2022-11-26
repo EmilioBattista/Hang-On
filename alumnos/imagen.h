@@ -13,15 +13,19 @@ typedef struct imagen imagen_t;
 
 void imagen_destruir(imagen_t *imagen);
 
-imagen_t *imagen_crear(size_t ancho, size_t alto);
+size_t imagen_get_ancho(const imagen_t *im);
 
-void imagen_get_dimensiones(const imagen_t *im, size_t *ancho, size_t *alto);
+size_t imagen_get_alto (const imagen_t *im);
+
+pixel_t imagen_get_pixel(const imagen_t *im, size_t x, size_t y);
 
 bool imagen_set_pixel(const imagen_t *im, size_t x, size_t y, pixel_t p);
 
+void imagen_get_dimensiones(const imagen_t *im, size_t *ancho, size_t *alto);
+
 void imagen_set_alto_ancho(imagen_t *im, size_t alto, size_t ancho);
 
-pixel_t imagen_get_pixel(const imagen_t *im, size_t x, size_t y);
+imagen_t *imagen_crear(size_t ancho, size_t alto);
 
 void imagen_pintar(imagen_t *im, pixel_t color);
 

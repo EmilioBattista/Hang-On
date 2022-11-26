@@ -1,5 +1,12 @@
 #include "ruta.h"
 
+#define ARBOL 0
+#define CARTEL 0
+#define ROCA 0
+#define DELFIN 0
+#define BELL 0
+#define FORUM 0
+
 const struct figura_en_ruta figuras_en_ruta[] = {
     {ARBOL, 38, -300, 0},
     {ARBOL, 38, 300, 1},
