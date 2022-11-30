@@ -1,10 +1,124 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-
+#include <stdlib.h>
 #include "config.h"
 #include "imagen.h"
 
+typedef uint8_t secuencia_t;
+
+
+bool leer_teselas(imagen_t *teselas[]){
+    FILE *fR = fopen(ARCHIVO_ROM_R, "rb");
+    if(fR==NULL){
+        return false;
+    }
+    FILE *fG = fopen(ARCHIVO_ROM_G, "rb");
+    if(fG==NULL){
+        return false;
+    }
+    FILE *fB = fopen(ARCHIVO_ROM_B, "rb");
+    if(fB==NULL){
+        return false;
+    }
+
+    secuencia_t sec_r[8];
+    secuencia_t sec_g[8];
+    secuencia_t sec_b[8];        
+
+
+    for(size_t k = 0;k < CANTIDAD_TESELAS;k++){
+        
+        if(fread(sec_r, sizeof(secuencia_t), 8, fR) != 8){
+            return false;
+        } 
+        if(fread(sec_g, sizeof(secuencia_t), 8, fG) != 8){
+            return false;
+            }
+        if(fread(sec_b, sizeof(secuencia_t), 8, fB) != 8){ 
+            return false;
+            }
+        
+        for(size_t j = 0; j < 8; j++){
+            for(size_t i = 0; i < 8; i++){
+                if(!imagen_set_pixel(teselas[k], i, j, pixel3_crear((sec_r[j] << i) & 0x80,(sec_g[j] << i) & 0x80, (sec_b[j] << i) & 0x80))){
+                    printf("4");
+                    return false;
+                }
+            }
+        }
+    }
+
+    fclose(fR);
+    fclose(fG);
+    fclose(fB);
+    return true;
+}
+
+
+
+/* 
+Las figuras se encuentran contenidas en las ROMs que van del 6819 al 6830 y luego del 6845 al 6846.
+
+Estas ROMs representan un bloque contínuo de memoria de tipo uint16_t donde como cada ROM tiene 32KB y hay 7 pares de ROMs serán entonces 229376 valores de 16 bits.
+
+Las ROMs están interlineadas, esto quiere decir, que el primer byte de la ROM 6819.rom se corresponde al byte bajo del primer valor, mientras que el primer byte de la ROM 6820.rom se corresponde al byte alto. La ROM 6819 aporta todos los bytes bajos de los primeros 32768 valores mientras que la ROM 6820 aporta todos los bits altos de estos mismos valores. Así para cada ROM, por ejemplo, el primer byte de la ROM 6821.rom aporta el byte bajo del valor 32769.
+
+Estas ROMs deben ser cargadas en memoria en un único vector uint16_t rom[229376] para poder ser accedidas para extraer las respectivas figuras allí contenidas.
+
+uint16_t rom[229376]
+
+
+for (romBaja, romAlta) in transformarAPares([6819..6830,6845..6846]):
+    baja = open(romBaja+".rom", "rb")
+    alta = open(romAlta+".rom", "rb")
+    for byte in alta:
+        rom[byteActual][alta] = byte
+    for byte in baja:
+        rom[byteActual][baja] = byte
+    
+
+*/
+
+bool leer_roms(uint16_t rom[]){
+    size_t byte = 0;
+    for(size_t romIndex = 6819; romIndex <= 6830; romIndex = romIndex + 2){ // TODO: agregar 6845,6846
+        // TODO: castear a string
+        char* ARCHIVO_BAJO = romIndex+ ".rom";
+        char* ARCHIVO_ALTO = (romIndex + 1) + ".rom";
+        
+        FILE *falto = fopen(ARCHIVO_ALTO, "rb");
+        if(falto==NULL){
+        return false;
+        }
+
+        FILE *fbajo = fopen(ARCHIVO_BAJO, "rb");
+        if(fbajo==NULL){
+        return false;
+        }
+
+        uint8_t talto;
+        uint8_t tbajo;
+        
+        for(size_t i = 0; i < 32768; i++){
+            if(fread(&talto, sizeof(uint8_t), 1, falto) != 1){
+            return false;
+            } 
+            if(fread(&tbajo, sizeof(uint8_t), 1, fbajo) != 1){
+            return false;
+            } 
+
+            rom[byte]= (talto);
+            rom[byte] = (rom[byte]<<8) || tbajo;
+            byte++;
+        }
+    }
+    return true;
+}
+
 int main() {
+    uint16_t *rom = malloc(sizeof(uint16_t) * 229376);
+
+
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window;
