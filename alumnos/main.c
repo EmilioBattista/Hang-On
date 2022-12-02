@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "config.h"
 #include "imagen.h"
 
@@ -78,13 +79,118 @@ for (romBaja, romAlta) in transformarAPares([6819..6830,6845..6846]):
     
 
 */
+/*
+distancia(xx,xm){
+    return xx - xm;
+}
+
+ubicacion(d){
+    return (96 - 96 * exp(-0.11 * (d)));
+}
+
+distancia(v){
+    return -(1/0.11) * log((96 - v)/96);
+}
+
+altura(v, h0){
+    return h0 * ((96 - v)/96) + ((5 * v) / 96);
+}
+
+desplasamiento_lateral_de_ruta (v, ym){
+    return -ym * ((96 - v)/96);
+}
+
+radio_curvatura(u){
+    return ;
+}
+
+curva(v){
+    if(v == 0){
+        return 0;
+    }
+    return curva(v - 1) + radio_curvatura(v) * exp((0.105 * v) - 8.6);
+}
+
+ur(){
+    return ;
+}
+
+desplasamiento_centro_curva(v){
+    return desplasamiento_lateral_de_ruta(v) + curva(v);
+}
+
+u(v, yx){
+    return (yx * (96 - v)) + (yx * (v/5000)) + ur(v);
+}
+
+
+
+
+
+posicion(v, m){
+    return m + (v * 1000 / 3600) * T;
+}
+
+acelerar(v){
+    return 279 - (279 - v) * exp(-0.224358 * T);
+}
+
+frenar(v){
+    if(v >= 10){
+        return v - 10;
+    }
+    return 0;
+}
+
+desacelerar(v){
+    if(v > 92){
+        return v - 3;
+    }
+}
+
+morder_vannquina(v){
+    return v - 3;
+}
+
+giro_derecha(){
+
+}
+
+giro_izquierda(){
+
+}
+
+giro_reposo(){
+    if(){
+
+    }
+}
+
+
+
+*/
+
+
 
 bool leer_roms(uint16_t rom[]){
     size_t byte = 0;
+    char r1[10];
+    char r2[10];
+    char rom1[20]="roms/";
+    char rom2[20]="roms/";
+    char rom3[]= ".rom";
+
     for(size_t romIndex = 6819; romIndex <= 6830; romIndex = romIndex + 2){ // TODO: agregar 6845,6846
         // TODO: castear a string
-        char* ARCHIVO_BAJO = romIndex+ ".rom";
-        char* ARCHIVO_ALTO = (romIndex + 1) + ".rom";
+        sprintf(r1, "%zu", romIndex);
+        sprintf(r2, "%zu", romIndex + 1);
+        strncat(r1, rom3, 5);
+        strncat(r2, rom3, 5);
+        strncat(rom1, r1, 9);
+        strncat(rom2, r2, 9);
+    
+        char* ARCHIVO_BAJO = rom1;
+        char* ARCHIVO_ALTO = rom2;
         
         FILE *falto = fopen(ARCHIVO_ALTO, "rb");
         if(falto==NULL){
@@ -108,7 +214,7 @@ bool leer_roms(uint16_t rom[]){
             } 
 
             rom[byte]= (talto);
-            rom[byte] = (rom[byte]<<8) || tbajo;
+            rom[byte] = (rom[byte]<8) || tbajo;
             byte++;
         }
     }
@@ -116,8 +222,6 @@ bool leer_roms(uint16_t rom[]){
 }
 
 int main() {
-    uint16_t *rom = malloc(sizeof(uint16_t) * 229376);
-
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -137,6 +241,8 @@ int main() {
     // BEGIN código del alumno
     double x = -10;
     bool mover = false;
+    uint16_t *rom = malloc(sizeof(uint16_t) * 229376);
+    leer_roms(rom);
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
@@ -220,6 +326,7 @@ int main() {
     }
 
     // BEGIN código del alumno
+    free(rom);
     // No tengo nada que destruir.
     // END código del alumno
 
