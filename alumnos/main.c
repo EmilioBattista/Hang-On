@@ -237,8 +237,10 @@ bool leer_roms(uint16_t* rom) {
     return true;
 }
 
-void update_eje_ruta(int* eje_de_ruta, int x_moto) {
-    // TODO: implementar
+void update_eje_ruta(int* eje_de_ruta, int desplazamiento_lateral_moto) {
+    for (size_t i = 0; i < 96; i++) {
+        eje_de_ruta[i] = desplazamiento_de_ruta(i, desplazamiento_lateral_moto);
+    }
 }
 
 int main() {
