@@ -3,6 +3,9 @@ LDIBS = -lm
 
 all: hangon
 
+play: hangon
+	./hangon
+
 hangon: main.o imagen.o pixel.o paleta.o fondo.o ruta.o
 	gcc main.o imagen.o pixel.o paleta.o fondo.o ruta.o -I include -L lib -l SDL2-2.0.0 -o hangon $(CFLAGS) $(LDIBS)
 

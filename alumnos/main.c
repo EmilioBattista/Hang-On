@@ -174,30 +174,27 @@ giro_reposo(){
 
 bool leer_roms(uint16_t rom[]){
     size_t byte = 0;
-    char r1[10];
-    char r2[10];
-    char rom1[20]="roms/";
-    char rom2[20]="roms/";
-    char rom3[]= ".rom";
+    char ARCHIVO_BAJO[14];
+    char ARCHIVO_ALTO[14];
+    FILE *falto, *fbajo;
 
-    for(size_t romIndex = 6819; romIndex <= 6830; romIndex = romIndex + 2){ // TODO: agregar 6845,6846
-        // TODO: castear a string
-        sprintf(r1, "%zu", romIndex);
-        sprintf(r2, "%zu", romIndex + 1);
-        strncat(r1, rom3, 5);
-        strncat(r2, rom3, 5);
-        strncat(rom1, r1, 9);
-        strncat(rom2, r2, 9);
-    
-        char* ARCHIVO_BAJO = rom1;
-        char* ARCHIVO_ALTO = rom2;
+    for(size_t romIndex = 6819; romIndex <= 6831; romIndex = romIndex + 2){ 
+        if (romIndex == 6831) { // Utilizo el 6831 para manejar el caso del 6845
+            romIndex = 6845;
+        }
+
+// TODO: chequear retornos para error 
+        sprintf(ARCHIVO_BAJO, "../roms/%zu.rom", romIndex);
+        sprintf(ARCHIVO_ALTO, "../roms/%zu.rom", romIndex + 1);
+        printf("%s", ARCHIVO_BAJO);
+        printf("%s", ARCHIVO_ALTO);
         
-        FILE *falto = fopen(ARCHIVO_ALTO, "rb");
+        falto = fopen(ARCHIVO_ALTO, "rb");
         if(falto==NULL){
         return false;
         }
 
-        FILE *fbajo = fopen(ARCHIVO_BAJO, "rb");
+        fbajo = fopen(ARCHIVO_BAJO, "rb");
         if(fbajo==NULL){
         return false;
         }
@@ -212,7 +209,7 @@ bool leer_roms(uint16_t rom[]){
             if(fread(&tbajo, sizeof(uint8_t), 1, fbajo) != 1){
             return false;
             } 
-
+            printf("%u\n", (unsigned int)talto);
             rom[byte]= (talto);
             rom[byte] = (rom[byte]<8) || tbajo;
             byte++;
@@ -242,7 +239,12 @@ int main() {
     double x = -10;
     bool mover = false;
     uint16_t *rom = malloc(sizeof(uint16_t) * 229376);
-    leer_roms(rom);
+
+    if (!leer_roms(rom)) {
+        printf("ERROR");
+        return 1;
+    }
+
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
