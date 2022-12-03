@@ -172,11 +172,12 @@ giro_reposo(){
 
 
 
-bool leer_roms(uint16_t rom[]){
+bool leer_roms(uint16_t *rom){
     size_t byte = 0;
-    char ARCHIVO_BAJO[14];
-    char ARCHIVO_ALTO[14];
+    char ARCHIVO_BAJO[20];
+    char ARCHIVO_ALTO[20];
     FILE *falto, *fbajo;
+
 
     for(size_t romIndex = 6819; romIndex <= 6831; romIndex = romIndex + 2){ 
         if (romIndex == 6831) { // Utilizo el 6831 para manejar el caso del 6845
@@ -186,19 +187,17 @@ bool leer_roms(uint16_t rom[]){
 // TODO: chequear retornos para error 
         sprintf(ARCHIVO_BAJO, "../roms/%zu.rom", romIndex);
         sprintf(ARCHIVO_ALTO, "../roms/%zu.rom", romIndex + 1);
-        printf("%s", ARCHIVO_BAJO);
-        printf("%s", ARCHIVO_ALTO);
         
-        falto = fopen(ARCHIVO_ALTO, "rb");
-        if(falto==NULL){
-        return false;
-        }
 
         fbajo = fopen(ARCHIVO_BAJO, "rb");
         if(fbajo==NULL){
-        return false;
+            return false;
         }
 
+        falto = fopen(ARCHIVO_ALTO, "rb");
+        if(falto==NULL){
+            return false;
+        }
         uint8_t talto;
         uint8_t tbajo;
         
@@ -209,7 +208,6 @@ bool leer_roms(uint16_t rom[]){
             if(fread(&tbajo, sizeof(uint8_t), 1, fbajo) != 1){
             return false;
             } 
-            printf("%u\n", (unsigned int)talto);
             rom[byte]= (talto);
             rom[byte] = (rom[byte]<8) || tbajo;
             byte++;
@@ -219,6 +217,7 @@ bool leer_roms(uint16_t rom[]){
 }
 
 int main() {
+    uint16_t *rom = malloc(sizeof(uint16_t) * 229376);
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -238,7 +237,6 @@ int main() {
     // BEGIN código del alumno
     double x = -10;
     bool mover = false;
-    uint16_t *rom = malloc(sizeof(uint16_t) * 229376);
 
     if (!leer_roms(rom)) {
         printf("ERROR");
@@ -338,4 +336,3 @@ int main() {
     SDL_Quit();
     return 0;
 }
-
