@@ -56,29 +56,6 @@ bool leer_teselas(imagen_t* teselas[]) {
 }
 
 
-
-/*
-Las figuras se encuentran contenidas en las ROMs que van del 6819 al 6830 y luego del 6845 al 6846.
-
-Estas ROMs representan un bloque contínuo de memoria de tipo uint16_t donde como cada ROM tiene 32KB y hay 7 pares de ROMs serán entonces 229376 valores de 16 bits.
-
-Las ROMs están interlineadas, esto quiere decir, que el primer byte de la ROM 6819.rom se corresponde al byte bajo del primer valor, mientras que el primer byte de la ROM 6820.rom se corresponde al byte alto. La ROM 6819 aporta todos los bytes bajos de los primeros 32768 valores mientras que la ROM 6820 aporta todos los bits altos de estos mismos valores. Así para cada ROM, por ejemplo, el primer byte de la ROM 6821.rom aporta el byte bajo del valor 32769.
-
-Estas ROMs deben ser cargadas en memoria en un único vector uint16_t rom[229376] para poder ser accedidas para extraer las respectivas figuras allí contenidas.
-
-uint16_t rom[229376]
-
-
-for (romBaja, romAlta) in transformarAPares([6819..6830,6845..6846]):
-    baja = open(romBaja+".rom", "rb")
-    alta = open(romAlta+".rom", "rb")
-    for byte in alta:
-        rom[byteActual][alta] = byte
-    for byte in baja:
-        rom[byteActual][baja] = byte
-
-
-*/
 /*
 distancia(xx,xm){
     return xx - xm;
@@ -172,6 +149,17 @@ giro_reposo(){
 
 
 
+
+/*
+Las figuras se encuentran contenidas en las ROMs que van del 6819 al 6830 y luego del 6845 al 6846.
+
+Estas ROMs representan un bloque contínuo de memoria de tipo uint16_t donde como cada ROM tiene 32KB y hay 7 pares de ROMs serán entonces 229376 valores de 16 bits.
+
+Las ROMs están interlineadas, esto quiere decir, que el primer byte de la ROM 6819.rom se corresponde al byte bajo del primer valor, mientras que el primer byte de la ROM 6820.rom se corresponde al byte alto. La ROM 6819 aporta todos los bytes bajos de los primeros 32768 valores mientras que la ROM 6820 aporta todos los bits altos de estos mismos valores. Así para cada ROM, por ejemplo, el primer byte de la ROM 6821.rom aporta el byte bajo del valor 32769.
+
+Estas ROMs deben ser cargadas en memoria en un único vector uint16_t rom[229376] para poder ser accedidas para extraer las respectivas figuras allí contenidas.
+
+*/
 bool leer_roms(uint16_t* rom) {
     size_t byte = 0;
     char ARCHIVO_BAJO[20];
