@@ -56,13 +56,17 @@ bool leer_teselas(imagen_t* teselas[]) {
 }
 
 
+// v(d)
+// vertical: posición vertical sobre la ruta
+// distancia: distancia hacia el objeto
+// el casting a int funciona como la función piso
+int vertical(distancia) {
+    return (96 - 96 * exp(-0.11 * (distancia)));
+}
+
 /*
 distancia(xx,xm){
     return xx - xm;
-}
-
-ubicacion(d){
-    return (96 - 96 * exp(-0.11 * (d)));
 }
 
 distancia(v){
