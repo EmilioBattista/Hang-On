@@ -73,12 +73,21 @@ float distancia(vertical) {
 }
 
 /*
-distancia(xx,xm){
-    return xx - xm;
+h(v)
+- altura: altura del objeto sobre la ruta, tomando en cuenta la perspectiva
+- vertical: posición vertical sobre la ruta
+- h0: altura del objeto sin perspectiva
+
+- Docs: Ahora bien, los objetos tienen una determinada altura que está referida a lo que ocupan cuando . Cabe preguntarse cómo se escalan cuando están a una determinada distancia [...] El ancho debe escalarse proporcionalmente al escalamiento en la altura. Si con esta cuenta el ancho diera menor a 3 pixeles se debe forzar en 3.
+*/
+
+altura(vertical, h0) {
+    return h0 * ((96 - vertical) / 96) + ((5 * vertical) / 96);
 }
 
-altura(v, h0){
-    return h0 * ((96 - v)/96) + ((5 * v) / 96);
+/*
+distancia(xx,xm){
+    return xx - xm;
 }
 
 desplasamiento_lateral_de_ruta (v, ym){
