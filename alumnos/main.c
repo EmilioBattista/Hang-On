@@ -82,7 +82,17 @@ h(v)
 */
 
 altura(vertical, h0) {
-    return h0 * ((96 - vertical) / 96) + ((5 * vertical) / 96);
+    return h0 * ((96 - vertical) / 96) + ((5 * vertical) / 96); // TODO: retornar 3 si el resultado es menor a 3
+}
+
+
+/*
+ul(v)
+- desplazamiento_lateral_moto (ym)
+- Docs: Teniendo la moto una posición con respecto al centro de la ruta ym, el desplazamiento lateral de la ruta se puede calcular como:
+*/
+desplazamiento_lateral_de_ruta(vertical, desplazamiento_lateral_moto) {
+    return -desplazamiento_lateral_moto * ((96 - vertical) / 96);
 }
 
 /*
@@ -90,9 +100,6 @@ distancia(xx,xm){
     return xx - xm;
 }
 
-desplasamiento_lateral_de_ruta (v, ym){
-    return -ym * ((96 - v)/96);
-}
 
 radio_curvatura(u){
     return ;
