@@ -138,7 +138,7 @@ ur(){
 }
 
 posicion(v, m){
-    return m + (v * 1000 / 3600) * T;
+    ret-Werror-Werrorurn m + (v * 1000 / 3600) * T;
 }
 
 acelerar(v){
@@ -237,6 +237,10 @@ bool leer_roms(uint16_t* rom) {
     return true;
 }
 
+void update_eje_ruta(int* eje_de_ruta, int x_moto) {
+    // TODO: implementar
+}
+
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -309,6 +313,9 @@ int main() {
         }
 
         // BEGIN código del alumno
+        update_eje_ruta(eje_de_ruta, x);
+
+
         imagen_t* cuadro = imagen_generar(320, 224, 0x00f);
 
         if (mover)
