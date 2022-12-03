@@ -64,13 +64,17 @@ int vertical(distancia) {
     return (96 - 96 * exp(-0.11 * (distancia)));
 }
 
+// d(v)
+// inversa de v(d)
+// vertical: posición vertical sobre la ruta
+// distancia: distancia hacia el objeto
+float distancia(vertical) {
+    return -(1 / 0.11) * log((96 - vertical) / 96);
+}
+
 /*
 distancia(xx,xm){
     return xx - xm;
-}
-
-distancia(v){
-    return -(1/0.11) * log((96 - v)/96);
 }
 
 altura(v, h0){
