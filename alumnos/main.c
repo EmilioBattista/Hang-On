@@ -205,8 +205,6 @@ bool leer_roms(uint16_t* rom) {
 }
 
 int main() {
-    uint16_t* rom = malloc(sizeof(uint16_t) * 229376);
-
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window* window;
@@ -223,6 +221,7 @@ int main() {
     int dormir = 0;
 
     // BEGIN código del alumno
+    uint16_t* rom = malloc(sizeof(uint16_t) * 229376);
     double x = -10;
     bool mover = false;
 
