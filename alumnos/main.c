@@ -8,40 +8,40 @@
 typedef uint8_t secuencia_t;
 
 
-bool leer_teselas(imagen_t *teselas[]){
-    FILE *fR = fopen(ARCHIVO_ROM_R, "rb");
-    if(fR==NULL){
+bool leer_teselas(imagen_t* teselas[]) {
+    FILE* fR = fopen(ARCHIVO_ROM_R, "rb");
+    if (fR == NULL) {
         return false;
     }
-    FILE *fG = fopen(ARCHIVO_ROM_G, "rb");
-    if(fG==NULL){
+    FILE* fG = fopen(ARCHIVO_ROM_G, "rb");
+    if (fG == NULL) {
         return false;
     }
-    FILE *fB = fopen(ARCHIVO_ROM_B, "rb");
-    if(fB==NULL){
+    FILE* fB = fopen(ARCHIVO_ROM_B, "rb");
+    if (fB == NULL) {
         return false;
     }
 
     secuencia_t sec_r[8];
     secuencia_t sec_g[8];
-    secuencia_t sec_b[8];        
+    secuencia_t sec_b[8];
 
 
-    for(size_t k = 0;k < CANTIDAD_TESELAS;k++){
-        
-        if(fread(sec_r, sizeof(secuencia_t), 8, fR) != 8){
+    for (size_t k = 0;k < CANTIDAD_TESELAS;k++) {
+
+        if (fread(sec_r, sizeof(secuencia_t), 8, fR) != 8) {
             return false;
-        } 
-        if(fread(sec_g, sizeof(secuencia_t), 8, fG) != 8){
+        }
+        if (fread(sec_g, sizeof(secuencia_t), 8, fG) != 8) {
             return false;
-            }
-        if(fread(sec_b, sizeof(secuencia_t), 8, fB) != 8){ 
+        }
+        if (fread(sec_b, sizeof(secuencia_t), 8, fB) != 8) {
             return false;
-            }
-        
-        for(size_t j = 0; j < 8; j++){
-            for(size_t i = 0; i < 8; i++){
-                if(!imagen_set_pixel(teselas[k], i, j, pixel3_crear((sec_r[j] << i) & 0x80,(sec_g[j] << i) & 0x80, (sec_b[j] << i) & 0x80))){
+        }
+
+        for (size_t j = 0; j < 8; j++) {
+            for (size_t i = 0; i < 8; i++) {
+                if (!imagen_set_pixel(teselas[k], i, j, pixel3_crear((sec_r[j] << i) & 0x80, (sec_g[j] << i) & 0x80, (sec_b[j] << i) & 0x80))) {
                     printf("4");
                     return false;
                 }
@@ -57,7 +57,7 @@ bool leer_teselas(imagen_t *teselas[]){
 
 
 
-/* 
+/*
 Las figuras se encuentran contenidas en las ROMs que van del 6819 al 6830 y luego del 6845 al 6846.
 
 Estas ROMs representan un bloque contínuo de memoria de tipo uint16_t donde como cada ROM tiene 32KB y hay 7 pares de ROMs serán entonces 229376 valores de 16 bits.
@@ -76,7 +76,7 @@ for (romBaja, romAlta) in transformarAPares([6819..6830,6845..6846]):
         rom[byteActual][alta] = byte
     for byte in baja:
         rom[byteActual][baja] = byte
-    
+
 
 */
 /*
@@ -172,44 +172,44 @@ giro_reposo(){
 
 
 
-bool leer_roms(uint16_t *rom){
+bool leer_roms(uint16_t* rom) {
     size_t byte = 0;
     char ARCHIVO_BAJO[20];
     char ARCHIVO_ALTO[20];
-    FILE *falto, *fbajo;
+    FILE* falto, * fbajo;
 
 
-    for(size_t romIndex = 6819; romIndex <= 6831; romIndex = romIndex + 2){ 
+    for (size_t romIndex = 6819; romIndex <= 6831; romIndex = romIndex + 2) {
         if (romIndex == 6831) { // Utilizo el 6831 para manejar el caso del 6845
             romIndex = 6845;
         }
 
-// TODO: chequear retornos para error 
+        // TODO: chequear retornos para error 
         sprintf(ARCHIVO_BAJO, "../roms/%zu.rom", romIndex);
         sprintf(ARCHIVO_ALTO, "../roms/%zu.rom", romIndex + 1);
-        
+
 
         fbajo = fopen(ARCHIVO_BAJO, "rb");
-        if(fbajo==NULL){
+        if (fbajo == NULL) {
             return false;
         }
 
         falto = fopen(ARCHIVO_ALTO, "rb");
-        if(falto==NULL){
+        if (falto == NULL) {
             return false;
         }
         uint8_t talto;
         uint8_t tbajo;
-        
-        for(size_t i = 0; i < 32768; i++){
-            if(fread(&talto, sizeof(uint8_t), 1, falto) != 1){
-            return false;
-            } 
-            if(fread(&tbajo, sizeof(uint8_t), 1, fbajo) != 1){
-            return false;
-            } 
-            rom[byte]= (talto);
-            rom[byte] = (rom[byte]<8) || tbajo;
+
+        for (size_t i = 0; i < 32768; i++) {
+            if (fread(&talto, sizeof(uint8_t), 1, falto) != 1) {
+                return false;
+            }
+            if (fread(&tbajo, sizeof(uint8_t), 1, fbajo) != 1) {
+                return false;
+            }
+            rom[byte] = (talto);
+            rom[byte] = (rom[byte] < 8) || tbajo;
             byte++;
         }
     }
@@ -217,19 +217,19 @@ bool leer_roms(uint16_t *rom){
 }
 
 int main() {
-    uint16_t *rom = malloc(sizeof(uint16_t) * 229376);
+    uint16_t* rom = malloc(sizeof(uint16_t) * 229376);
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window *window;
-    SDL_Renderer *renderer;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
     SDL_Event event;
 
     SDL_CreateWindowAndRenderer(VENTANA_ANCHO, VENTANA_ALTO, 0, &window, &renderer);
     SDL_SetWindowTitle(window, "Hang-On");
 
-    SDL_Texture * texture = SDL_CreateTexture(renderer,
-    SDL_PIXELFORMAT_RGB444, SDL_TEXTUREACCESS_STATIC, VENTANA_ANCHO, VENTANA_ALTO);
+    SDL_Texture* texture = SDL_CreateTexture(renderer,
+        SDL_PIXELFORMAT_RGB444, SDL_TEXTUREACCESS_STATIC, VENTANA_ANCHO, VENTANA_ALTO);
     uint16_t canvas[VENTANA_ALTO * VENTANA_ANCHO];
 
     int dormir = 0;
@@ -246,37 +246,37 @@ int main() {
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
-    while(1) {
-        if(SDL_PollEvent(&event)) {
+    while (1) {
+        if (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 break;
             // BEGIN código del alumno
             if (event.type == SDL_KEYDOWN) {
                 // Se apretó una tecla
-                switch(event.key.keysym.sym) {
-                    case SDLK_UP:
-                        mover = true;
-                        break;
-                    case SDLK_DOWN:
-                        break;
-                    case SDLK_RIGHT:
-                        break;
-                    case SDLK_LEFT:
-                        break;
+                switch (event.key.keysym.sym) {
+                case SDLK_UP:
+                    mover = true;
+                    break;
+                case SDLK_DOWN:
+                    break;
+                case SDLK_RIGHT:
+                    break;
+                case SDLK_LEFT:
+                    break;
                 }
             }
             else if (event.type == SDL_KEYUP) {
                 // Se soltó una tecla
-                switch(event.key.keysym.sym) {
-                    case SDLK_UP:
-                        mover = false;
-                        break;
-                    case SDLK_DOWN:
-                        break;
-                    case SDLK_RIGHT:
-                        break;
-                    case SDLK_LEFT:
-                        break;
+                switch (event.key.keysym.sym) {
+                case SDLK_UP:
+                    mover = false;
+                    break;
+                case SDLK_DOWN:
+                    break;
+                case SDLK_RIGHT:
+                    break;
+                case SDLK_LEFT:
+                    break;
                 }
             }
             // END código del alumno
@@ -284,24 +284,24 @@ int main() {
         }
 
         // BEGIN código del alumno
-        imagen_t *cuadro = imagen_generar(320, 224, 0x00f);
+        imagen_t* cuadro = imagen_generar(320, 224, 0x00f);
 
-        if(mover)
+        if (mover)
             x += 1;
-        if(x > 320)
+        if (x > 320)
             x = -10;
 
-        imagen_t *cuadrado = imagen_generar(10, 10, 0x0f0);
+        imagen_t* cuadrado = imagen_generar(10, 10, 0x0f0);
         imagen_pegar(cuadro, cuadrado, x, (224 - 10) / 2);
         imagen_destruir(cuadrado);
 
         // Procedemos a dibujar a pantalla completa:
-        imagen_t *cuadro_escalado = imagen_escalar(cuadro, VENTANA_ANCHO, VENTANA_ALTO);
+        imagen_t* cuadro_escalado = imagen_escalar(cuadro, VENTANA_ANCHO, VENTANA_ALTO);
         // Hay que implementar esta función que dibuja de forma eficiente:
         //imagen_a_textura(cuadro_escalado, canvas);
         // Como todavía no la tenemos lo hacemos de forma ineficiente con primitivas:
-        for(size_t f = 0; f < imagen_get_alto(cuadro_escalado); f++)
-            for(size_t c = 0; c < imagen_get_ancho(cuadro_escalado); c++)
+        for (size_t f = 0; f < imagen_get_alto(cuadro_escalado); f++)
+            for (size_t c = 0; c < imagen_get_ancho(cuadro_escalado); c++)
                 canvas[f * imagen_get_ancho(cuadro_escalado) + c] = imagen_get_pixel(cuadro_escalado, c, f);
         // Implementar imagen_a_textura() cuanto antes!
 
@@ -314,11 +314,11 @@ int main() {
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
         ticks = SDL_GetTicks() - ticks;
-        if(dormir) {
+        if (dormir) {
             SDL_Delay(dormir);
             dormir = 0;
         }
-        else if(ticks < 1000 / JUEGO_FPS)
+        else if (ticks < 1000 / JUEGO_FPS)
             SDL_Delay(1000 / JUEGO_FPS - ticks);
         else
             printf("Perdiendo cuadros\n");
