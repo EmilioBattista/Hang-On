@@ -122,6 +122,13 @@ float desplazamiento_de_ruta(vertical) {
 }
 
 
+/*
+Doc: Volviendo a los objetos, para posicionar una figura en la pantalla tenemos su posición en v, su altura h y nos falta conocer su posición u. Esta posición será computada como:
+*/
+u(v, yx) {
+    return yx * (96 - v) / 96 + (yx * v / 5000) + ur(v);
+}
+
 
 /*
 distancia(xx,xm){
@@ -130,11 +137,6 @@ distancia(xx,xm){
 
 ur(){
     return ;
-}
-
-
-u(v, yx){
-    return (yx * (96 - v)) + (yx * (v/5000)) + ur(v);
 }
 
 posicion(v, m){
