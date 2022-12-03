@@ -328,6 +328,7 @@ int main() {
 
         imagen_t* cuadrado = imagen_generar(10, 10, 0x0f0);
         imagen_pegar(cuadro, cuadrado, x, (224 - 10) / 2);
+        // TODO: @EmilioBattista agregar la imagen de la moto
         imagen_destruir(cuadrado);
 
         // Procedemos a dibujar a pantalla completa:
