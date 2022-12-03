@@ -60,7 +60,7 @@ bool leer_teselas(imagen_t* teselas[]) {
 // vertical: posición vertical sobre la ruta
 // distancia: distancia hacia el objeto
 // el casting a int funciona como la función piso
-int vertical(distancia) {
+int vertical(int distancia) {
     return (96 - 96 * exp(-0.11 * (distancia)));
 }
 
@@ -68,7 +68,7 @@ int vertical(distancia) {
 // inversa de v(d)
 // vertical: posición vertical sobre la ruta
 // distancia: distancia hacia el objeto
-float distancia(vertical) {
+float distancia(int vertical) {
     return -(1 / 0.11) * log((96 - vertical) / 96);
 }
 
@@ -81,7 +81,7 @@ h(v)
 - Docs: Ahora bien, los objetos tienen una determinada altura que está referida a lo que ocupan cuando . Cabe preguntarse cómo se escalan cuando están a una determinada distancia [...] El ancho debe escalarse proporcionalmente al escalamiento en la altura. Si con esta cuenta el ancho diera menor a 3 pixeles se debe forzar en 3.
 */
 
-size_t altura(vertical, h0) {
+size_t altura(int vertical, int h0) {
     return h0 * ((96 - vertical) / 96) + ((5 * vertical) / 96); // TODO: retornar 3 si el resultado es menor a 3
 }
 
@@ -91,42 +91,40 @@ ul(v)
 - desplazamiento_lateral_moto (ym)
 - Docs: Teniendo la moto una posición con respecto al centro de la ruta ym, el desplazamiento lateral de la ruta se puede calcular como:
 */
-float desplazamiento_lateral(vertical, desplazamiento_lateral_moto) {
+float desplazamiento_lateral(int vertical, int desplazamiento_lateral_moto) {
     return -desplazamiento_lateral_moto * ((96 - vertical) / 96);
 }
 
+// TODO: implementar
+float radio_curvatura(int u) {
+    return 0;
+}
 /*
 uc(v)
 
 Doc: Como la ruta tiene transiciones, el cómputo del desplazamiento de curva tiene que hacerse acumulativo con los radios de los diferentes tramos que se observan. Para cada valor de puede saberse a qué tramo representa dado que se conoce la posición xm de la moto y puede obtenerse la posición de ese tramo como xm + d(v).
 */
-float desplazamiento_por_curva(vertical) {
+float desplazamiento_por_curva(int vertical) {
     if (vertical == 0) {
         return 0;
     }
     return desplazamiento_por_curva(vertical - 1) + radio_curvatura(vertical) * exp(0.105 * vertical - 8.6);
 }
 
-
-// TODO: implementar
-float radio_curvatura(u) {
-    return 0;
-}
-
 /*
 ur(v) = ul(v) + uc(v)
 Doc: El desplazamiento del centro de la ruta va a ser la suma , la idea es computar este vector de 96 posiciones una vez por cada instante dado que el mismo no sólo sirve para dibujar la ruta sino, como ahora veremos, también sirve para posicionar el resto de los objetos en la pantalla.
 */
-float desplazamiento_de_ruta(vertical) {
-    return desplazamiento_lateral(vertical) + desplazamiento_por_curva(vertical);
+float desplazamiento_de_ruta(int vertical, int desplazamiento_lateral_moto) {
+    return desplazamiento_lateral(vertical, desplazamiento_lateral_moto) + desplazamiento_por_curva(vertical);
 }
 
 
 /*
 Doc: Volviendo a los objetos, para posicionar una figura en la pantalla tenemos su posición en v, su altura h y nos falta conocer su posición u. Esta posición será computada como:
 */
-u(v, yx) {
-    return yx * (96 - v) / 96 + (yx * v / 5000) + ur(v);
+int u(int v, int yx, int desplazamiento_lateral_moto) {
+    return yx * (96 - v) / 96 + (yx * v / 5000) + desplazamiento_de_ruta(v, desplazamiento_lateral_moto);
 }
 
 
