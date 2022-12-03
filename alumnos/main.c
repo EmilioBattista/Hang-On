@@ -221,13 +221,18 @@ int main() {
     int dormir = 0;
 
     // BEGIN código del alumno
-    uint16_t* rom = malloc(sizeof(uint16_t) * 229376);
+    uint16_t* rom = malloc(sizeof(uint16_t) * 229376); // TODO: free or static
     double x = -10;
     bool mover = false;
 
     if (!leer_roms(rom)) {
         printf("ERROR");
         return 1;
+    }
+
+    int* eje_de_ruta = malloc(sizeof(int) * 96); // TODO: free or static
+    for (size_t i = 0; i < 96; i++) {
+        eje_de_ruta[i] = 0;
     }
 
     // END código del alumno
