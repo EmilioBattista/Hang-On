@@ -96,6 +96,7 @@ float desplazamiento_lateral(int vertical, int desplazamiento_lateral_moto) {
 }
 
 // TODO: implementar
+// esta función deberá depender de algún otro dato externo sobre la ruta, una especie de "mapa"
 float radio_curvatura(int u) {
     return 0;
 }
