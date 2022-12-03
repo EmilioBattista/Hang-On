@@ -117,7 +117,7 @@ float radio_curvatura(u) {
 ur(v) = ul(v) + uc(v)
 Doc: El desplazamiento del centro de la ruta va a ser la suma , la idea es computar este vector de 96 posiciones una vez por cada instante dado que el mismo no sólo sirve para dibujar la ruta sino, como ahora veremos, también sirve para posicionar el resto de los objetos en la pantalla.
 */
-desplazamiento_de_ruta(vertical) {
+float desplazamiento_de_ruta(vertical) {
     return desplazamiento_lateral(vertical) + desplazamiento_por_curva(vertical);
 }
 
