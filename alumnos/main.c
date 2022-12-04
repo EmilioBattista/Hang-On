@@ -343,6 +343,58 @@ void update_estado_moto(float* posicion_x_m, float* posicion_y_m, float* velocid
         *posicion_y_m = *posicion_y_m - 15;
     }
 
+    /*
+    Irse al pasto:
+
+    Si my es mayor a 435 en módulo, entonces se fuerza en 435 con el signo que corresponda.
+    */
+    if (*posicion_y_m > 435) {
+        *posicion_y_m = 435;
+    }
+    else if (*posicion_y_m < -435) {
+        *posicion_y_m = -435;
+    }
+
+    /*
+    TODO:
+    Giro de la ruta:
+
+    Siendo
+
+la distancia avanzada en el paso de tiempo actual, la posición sobre la ruta se actualizará según la cantidad:
+
+Siendo
+
+    el radio de la curva en esa posición.
+
+Puntaje:
+
+    El puntaje se computa como
+
+si la moto circula a menos de 117 km/h y como si la velocidad
+
+    es superior.
+
+    En caso de estar mordiendo la banquina no se suma ningún punto.
+
+Ganar:
+
+    Se gana si se llega al final de la ruta en 4200 metros.
+
+Perder:
+
+    Se pierde si se acaban los 75 segundos y no se llegó a la llegada.
+
+Choques:
+
+    Si la posición de la moto está entre el lado izquierdo y el derecho de una figura (no nos olvidemos de que la y de las figuras está en el centro) y la figura está a menos de
+
+metros de distancia de la moto se produce un choque. Cuando se choca la moto vuelve a
+
+con velocidad 0 y el juego se queda detenido durante 5 segundos.
+
+(Esta distancia en metros se toma siendo la velocidad máxima de 279 km/h, por ejemplo a una tasa de 30 cuadros por segundo esta cuenta da 3 metros siendo que la moto recorre como máximo 2,58 metros por cuadro.)
+    */
 }
 
 int main() {
