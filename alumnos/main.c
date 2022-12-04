@@ -244,6 +244,107 @@ void update_eje_ruta(int* eje_de_ruta, int desplazamiento_lateral_moto) {
     }
 }
 
+void update_estado_moto(float* posicion_x_m, float* posicion_y_m, float* velocidad_actual_km_h, float* giro_actual, bool input_aceletando, bool input_frenando, bool* input_giro_derecha, bool* input_giro_izquierda) {
+    /*
+    La posición se actualizará en cada instante según la velocidad y el paso temporal. Tomar en cuenta que la velocidad se mide en km/h mientras que al posición se mide en metros, por lo que hay que convertir las unidades.
+    */
+    *posicion_x_m = *posicion_x_m + (*velocidad_actual_km_h * 1000 / 3600) * DELTA_TIME;
+
+    /*
+    Si está presionado el acelerador o si la moto está a menos de 80 km/h entonces se acelera
+    */
+    if (input_aceletando || *velocidad_actual_km_h < 80) {
+        *velocidad_actual_km_h = 279 - (279 - *velocidad_actual_km_h) * exp(-0.224358 * DELTA_TIME);
+    }
+
+    /*
+    Por cada segundo que el freno esté presionado se le restan 300 km/h a la velocidad.
+
+    (Podemos asumir que no se presionan acelerador y freno a la vez, en el juego original el freno le gana al acelerador.)
+    */
+    if (input_frenando) {
+        *velocidad_actual_km_h = *velocidad_actual_km_h - 300 * DELTA_TIME;
+    }
+
+    /*
+    Si no se está presionando ni el acelerador ni el freno por cada segundo transcurrido se le restan 90 km/h a la velocidad.
+    */
+    if (!input_aceletando && !input_frenando) {
+        *velocidad_actual_km_h = *velocidad_actual_km_h - 90 * DELTA_TIME;
+    }
+
+    /*
+    Morder la banquina:
+    Si la posición my es superior a 215 metros (en módulo) y además la velocidad es superior a 92 km/h entonces en ese instante se le restan 3 km/h a la velocidad
+    */
+    if (abs(*posicion_y_m) > 215 && *velocidad_actual_km_h > 92) {
+        *velocidad_actual_km_h = *velocidad_actual_km_h - 3;
+    }
+
+    /*
+    Giro:
+
+        Hay tres intensidades de giro para cada lado y una posición neutral.
+
+    Giro a la derecha:
+
+        Si está presionado el giro a la derecha y todavía no se alcanzó la tercera intensidad de giro a la derecha, se incrementa el giro en esa dirección.
+
+    Giro a la izquierda:
+
+        Análogo al giro a la derecha
+    */
+    if (*input_giro_derecha && *giro_actual < 3) {
+        *giro_actual = *giro_actual + 1;
+        *input_giro_derecha = false;
+    }
+
+    if (*input_giro_izquierda && *giro_actual > -3) {
+        *giro_actual = *giro_actual - 1;
+        *input_giro_izquierda = false;
+    }
+
+    /*
+    Reposo:
+
+    Si no está presionado ningún giro pero todavía hay intensidad de giro en alguna dirección entonces se bajará la intensidad una unidad.
+    */
+
+    if (!*input_giro_derecha && !*input_giro_izquierda && *giro_actual != 0) {
+        if (*giro_actual > 0) {
+            *giro_actual = *giro_actual - 1;
+        }
+        else {
+            *giro_actual = *giro_actual + 1;
+        }
+    }
+
+    /*
+    Posición my:
+
+    La posición se incrementa en 3, 9 o 15 metros según la intensidad del giro, en la dirección que corresponda.
+    */
+    if (*giro_actual == 1) {
+        *posicion_y_m = *posicion_y_m + 3;
+    }
+    else if (*giro_actual == 2) {
+        *posicion_y_m = *posicion_y_m + 9;
+    }
+    else if (*giro_actual == 3) {
+        *posicion_y_m = *posicion_y_m + 15;
+    }
+    else if (*giro_actual == -1) {
+        *posicion_y_m = *posicion_y_m - 3;
+    }
+    else if (*giro_actual == -2) {
+        *posicion_y_m = *posicion_y_m - 9;
+    }
+    else if (*giro_actual == -3) {
+        *posicion_y_m = *posicion_y_m - 15;
+    }
+
+}
+
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -275,6 +376,16 @@ int main() {
         eje_de_ruta[i] = 0;
     }
 
+    float velocidad_actual_km_h = 0;
+    int giro_actual = 0; // 0 = reposo, derecha positivo, izquierda negativo. Va desde -3 a 3
+    float posicion_x_m = 0;
+    float posicion_y_m = 0;
+
+    bool input_aceletando = false;
+    bool input_frenando = false;
+    bool input_giro_derecha = false;
+    bool input_giro_izquierda = false;
+
     // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
@@ -287,13 +398,16 @@ int main() {
                 // Se apretó una tecla
                 switch (event.key.keysym.sym) {
                 case SDLK_UP:
-                    mover = true;
+                    input_aceletando = true;
                     break;
                 case SDLK_DOWN:
+                    input_frenando = true;
                     break;
                 case SDLK_RIGHT:
+                    input_giro_derecha = true;
                     break;
                 case SDLK_LEFT:
+                    input_giro_izquierda = true;
                     break;
                 }
             }
@@ -301,13 +415,16 @@ int main() {
                 // Se soltó una tecla
                 switch (event.key.keysym.sym) {
                 case SDLK_UP:
-                    mover = false;
+                    input_aceletando = false;
                     break;
                 case SDLK_DOWN:
+                    input_frenando = false;
                     break;
                 case SDLK_RIGHT:
+                    input_giro_derecha = false;
                     break;
                 case SDLK_LEFT:
+                    input_giro_izquierda = false;
                     break;
                 }
             }
@@ -317,6 +434,7 @@ int main() {
 
         // BEGIN código del alumno
         update_eje_ruta(eje_de_ruta, x);
+        update_estado_moto(&posicion_x_m, &posicion_y_m, &velocidad_actual_km_h, &giro_actual, input_aceletando, input_frenando, &input_giro_derecha, &input_giro_izquierda);
 
 
         imagen_t* cuadro = imagen_generar(320, 224, 0x00f);
