@@ -244,7 +244,7 @@ void update_eje_ruta(int* eje_de_ruta, int desplazamiento_lateral_moto) {
     }
 }
 
-void update_estado_moto(float* posicion_x_m, float* posicion_y_m, float* velocidad_actual_km_h, float* giro_actual, bool input_aceletando, bool input_frenando, bool* input_giro_derecha, bool* input_giro_izquierda) {
+void update_estado_moto(float* posicion_x_m, float* posicion_y_m, float* velocidad_actual_km_h, int* giro_actual, bool input_aceletando, bool input_frenando, bool* input_giro_derecha, bool* input_giro_izquierda) {
     /*
     La posición se actualizará en cada instante según la velocidad y el paso temporal. Tomar en cuenta que la velocidad se mide en km/h mientras que al posición se mide en metros, por lo que hay que convertir las unidades.
     */
