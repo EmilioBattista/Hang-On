@@ -415,8 +415,6 @@ int main() {
 
     // BEGIN código del alumno
     uint16_t* rom = malloc(sizeof(uint16_t) * 229376); // TODO: free or static
-    double x = -10;
-    bool mover = false;
 
     if (!leer_roms(rom)) {
         printf("ERROR");
@@ -485,19 +483,16 @@ int main() {
         }
 
         // BEGIN código del alumno
-        update_eje_ruta(eje_de_ruta, x);
+        update_eje_ruta(eje_de_ruta, posicion_x_m);
         update_estado_moto(&posicion_x_m, &posicion_y_m, &velocidad_actual_km_h, &giro_actual, input_aceletando, input_frenando, &input_giro_derecha, &input_giro_izquierda);
 
+        // imprimimos el estado
+        printf("posicion_x_m: %f, posicion_y_m: %f, velocidad_actual_km_h: %f, giro_actual: %d\n", posicion_x_m, posicion_y_m, velocidad_actual_km_h, giro_actual);
 
         imagen_t* cuadro = imagen_generar(320, 224, 0x00f);
 
-        if (mover)
-            x += 1;
-        if (x > 320)
-            x = -10;
-
         imagen_t* cuadrado = imagen_generar(10, 10, 0x0f0);
-        imagen_pegar(cuadro, cuadrado, x, (224 - 10) / 2);
+        imagen_pegar(cuadro, cuadrado, posicion_x_m, (224 - 10) / 2);
         // TODO: @EmilioBattista agregar la imagen de la moto
         imagen_destruir(cuadrado);
 
