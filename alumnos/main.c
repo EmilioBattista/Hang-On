@@ -130,61 +130,6 @@ int u(int v, int yx, int desplazamiento_lateral_moto) {
 
 
 /*
-distancia(xx,xm){
-    return xx - xm;
-}
-
-ur(){
-    return ;
-}
-
-posicion(v, m){
-    ret-Werror-Werrorurn m + (v * 1000 / 3600) * T;
-}
-
-acelerar(v){
-    return 279 - (279 - v) * exp(-0.224358 * T);
-}
-
-frenar(v){
-    if(v >= 10){
-        return v - 10;
-    }
-    return 0;
-}
-
-desacelerar(v){
-    if(v > 92){
-        return v - 3;
-    }
-}
-
-morder_vannquina(v){
-    return v - 3;
-}
-
-giro_derecha(){
-
-}
-
-giro_izquierda(){
-
-}
-
-giro_reposo(){
-    if(){
-
-    }
-}
-
-
-
-*/
-
-
-
-
-/*
 Las figuras se encuentran contenidas en las ROMs que van del 6819 al 6830 y luego del 6845 al 6846.
 
 Estas ROMs representan un bloque contínuo de memoria de tipo uint16_t donde como cada ROM tiene 32KB y hay 7 pares de ROMs serán entonces 229376 valores de 16 bits.
@@ -279,6 +224,10 @@ void update_estado_moto(float* posicion_x_m, float* posicion_y_m, float* velocid
     */
     if (abs(*posicion_y_m) > 215 && *velocidad_actual_km_h > 92) {
         *velocidad_actual_km_h = *velocidad_actual_km_h - 3;
+    }
+
+    if (*velocidad_actual_km_h < 0) {
+        *velocidad_actual_km_h = 0;
     }
 
     /*
@@ -492,7 +441,7 @@ int main() {
         imagen_t* cuadro = imagen_generar(320, 224, 0x00f);
 
         imagen_t* cuadrado = imagen_generar(10, 10, 0x0f0);
-        imagen_pegar(cuadro, cuadrado, posicion_x_m, (224 - 10) / 2);
+        imagen_pegar(cuadro, cuadrado, posicion_y_m, (224 - 10) / 2);
         // TODO: @EmilioBattista agregar la imagen de la moto
         imagen_destruir(cuadrado);
 
