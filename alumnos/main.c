@@ -245,12 +245,10 @@ void update_estado_moto(float* posicion_x_m, float* posicion_y_m, float* velocid
     */
     if (*input_giro_derecha && *giro_actual < 3) {
         *giro_actual = *giro_actual + 1;
-        *input_giro_derecha = false;
     }
 
     if (*input_giro_izquierda && *giro_actual > -3) {
         *giro_actual = *giro_actual - 1;
-        *input_giro_izquierda = false;
     }
 
     /*
@@ -344,6 +342,10 @@ con velocidad 0 y el juego se queda detenido durante 5 segundos.
 
 (Esta distancia en metros se toma siendo la velocidad máxima de 279 km/h, por ejemplo a una tasa de 30 cuadros por segundo esta cuenta da 3 metros siendo que la moto recorre como máximo 2,58 metros por cuadro.)
     */
+
+
+    * input_giro_derecha = false;
+    *input_giro_izquierda = false;
 }
 
 int main() {
