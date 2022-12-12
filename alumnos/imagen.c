@@ -112,10 +112,10 @@ imagen_t *imagen_escalar(const imagen_t *origen, size_t ancho_destino, size_t al
 
 
 void imagen_pegar(imagen_t *destino, const imagen_t *origen, int x, int y){
-    for (size_t i = 0;  i < origen->alto; i++){
-        for (size_t j = 0;  j < origen->ancho; j++){
-            if(origen->pixel[i][j] && i+y >= 0 && j+x >= 0  && i+y < destino->alto && j+x < destino->ancho){
-                destino->pixel[i+y][j+x]=origen->pixel[i][j];
+    for(int f = y >= 0 ? 0 : -y; f < origen->alto && f + y < destino->alto; f++){
+    for(int c = x >= 0 ? 0 : -x; c < origen->ancho && c + x < destino->ancho; c++){
+            if(origen->pixel[f][c] && f+y >= 0 && c+x >= 0  && f+y < destino->alto && c+x < destino->ancho){
+                destino->pixel[f+y][c+x]=origen->pixel[f][c];
             }
         }
     }
@@ -124,10 +124,10 @@ void imagen_pegar(imagen_t *destino, const imagen_t *origen, int x, int y){
 
 
 void imagen_pegar_con_paleta(imagen_t *destino, const imagen_t *origen, int x, int y, const pixel_t paleta[]){
-    for (size_t i = 0;  i < origen->alto; i++){
-        for (size_t j = 0;  j < origen->ancho; j++){
-            if(origen->pixel[i][j] && i+y >= 0 && j+x >= 0  && i+y < destino->alto && j+x < destino->ancho){
-                destino->pixel[i+y][j+x]=paleta[origen->pixel[i][j]];
+    for(int f = y >= 0 ? 0 : -y; f < origen->alto && f + y < destino->alto; f++){
+    for(int c = x >= 0 ? 0 : -x; c < origen->ancho && c + x < destino->ancho; c++){
+            if(origen->pixel[f][c] && f+y >= 0 && c+x >= 0  && f+y < destino->alto && c+x < destino->ancho){
+                destino->pixel[f+y][c+x]=paleta[origen->pixel[f][c]];
             } 
         }
     }

@@ -8,6 +8,66 @@
 typedef uint8_t secuencia_t;
 
 
+
+pixel_t rom_bit_a_pixel(uint16_t lin, size_t i){
+    if(((lin << i * 4) & 0xf) == 0xf){
+        return 0;
+    }
+    return (((lin << i * 4) & 0xf) >> 12);
+}
+
+bool es_d_f(uint16_t dato){
+    if((dato & 0x000f) == 0x000f){
+        return true;
+    }
+    return false;
+}
+
+imagen_t *rom_a_figura(uint16_t rom[], size_t alto, size_t ancho, size_t inicio){
+    imagen_t *im = imagen_crear(ancho, alto);
+    if(im==NULL){
+        return NULL;        
+    }
+    size_t contador_rom = inicio;
+    for(size_t j = 0; j < imagen_get_alto(im); j++){
+        for(size_t i = 0; i < imagen_get_ancho(im) && (j < imagen_get_alto(im)); i += 4){
+            if(!(es_d_f(rom[contador_rom]))){
+                for(size_t k = 0; k < 3; k++){
+                    if(!imagen_set_pixel(im, i + k, j, rom_bit_a_pixel(rom[contador_rom], k))){
+                        return NULL;
+                    }
+                }
+                i = -4;
+                j++;
+                contador_rom++;
+            }
+            else{
+                for(size_t k = 0; k < 4; k++){
+                    if(!imagen_set_pixel(im, i + k, j, rom_bit_a_pixel(rom[contador_rom], k))){
+                        return NULL;
+                    } 
+                }
+                contador_rom++;
+            }
+        }
+    }
+    return im;
+}
+
+imagen_t *generar_mosaico(imagen_t *teselas[], const pixel_t paleta[][8], size_t filas, size_t columnas, const uint16_t mosaico_teselas[filas][columnas], const uint8_t mosaico_paletas[filas][columnas]){
+
+    imagen_t *im = imagen_generar(columnas * 8, filas * 8, 0);
+    if(im == NULL) return NULL;
+
+    for(size_t j = 0; j < filas; j++){
+        for(size_t i = 0; i < columnas; i++){
+            imagen_pegar_con_paleta(im, teselas[mosaico_teselas[j][i]], i * 8, j * 8, paleta[mosaico_paletas[j][i]]);
+        }
+    }
+    return im;
+}
+
+
 bool leer_teselas(imagen_t* teselas[]) {
     FILE* fR = fopen(ARCHIVO_ROM_R, "rb");
     if (fR == NULL) {
@@ -222,7 +282,7 @@ void update_estado_moto(float* posicion_x_m, float* posicion_y_m, float* velocid
     Morder la banquina:
     Si la posición my es superior a 215 metros (en módulo) y además la velocidad es superior a 92 km/h entonces en ese instante se le restan 3 km/h a la velocidad
     */
-    if (abs(*posicion_y_m) > 215 && *velocidad_actual_km_h > 92) {
+    if (fabs(*posicion_y_m) > 215 && *velocidad_actual_km_h > 92) {
         *velocidad_actual_km_h = *velocidad_actual_km_h - 3;
     }
 
@@ -365,12 +425,47 @@ int main() {
     int dormir = 0;
 
     // BEGIN código del alumno
+
+    imagen_t *teselas[CANTIDAD_TESELAS];
+
+    for(size_t i = 0; i < CANTIDAD_TESELAS; i++)
+        teselas[i] = imagen_generar(ANCHO_TESELA, ALTO_TESELA, 0);
+
+    if(! leer_teselas(teselas)) {
+        fprintf(stderr, "No se pudieron leer las teselas\n");
+
+        for(size_t i = 0; i < CANTIDAD_TESELAS; i++)
+            imagen_destruir(teselas[i]);
+
+        return 1;
+    }
+
+    imagen_t *fondo1 = generar_mosaico(teselas, paleta_3, FONDO1_FILAS, FONDO1_COLUMNAS, fondo1_mosaico, fondo1_paleta);
+    imagen_t *fondo2 = generar_mosaico(teselas, paleta_3, FONDO2_FILAS, FONDO2_COLUMNAS, fondo2_mosaico, fondo2_paleta);
+
+    for(size_t i = 0; i < CANTIDAD_TESELAS; i++)
+        imagen_destruir(teselas[i]);
+
+    imagen_t *pasto = imagen_generar(1, 96, pixel12_crear(0, 13, 9));
+    pixel_t colores_pasto[10] = {0x089, 0x099, 0x099, 0x0a9, 0x0a9, 0x0a9, 0x0b9, 0x0b9, 0x0c9, 0x0c9};
+    for(size_t i = 0; i < 10; i++)
+        imagen_set_pixel(pasto, 0, i, colores_pasto[i]);
+
+    imagen_t *pasto_estirado = imagen_escalar(pasto, 320, 96);
+    imagen_destruir(pasto);
+
+
+
+
+
     uint16_t* rom = malloc(sizeof(uint16_t) * 229376); // TODO: free or static
 
     if (!leer_roms(rom)) {
         printf("ERROR");
         return 1;
     }
+
+    imagen_t *moto1 = rom_a_figura(rom, ALTO_MOTO_1, ANCHO_MOTO_1, INICIO_MOTO_1);
 
     int* eje_de_ruta = malloc(sizeof(int) * 96); // TODO: free or static
     for (size_t i = 0; i < 96; i++) {
@@ -444,7 +539,15 @@ int main() {
 
         imagen_t* cuadrado = imagen_generar(10, 10, 0x0f0);
         imagen_pegar(cuadro, cuadrado, posicion_y_m, (224 - 10) / 2);
+        imagen_pegar(cuadro, fondo2, -posicion_y_m * 3/4, 64);
+        imagen_pegar(cuadro, fondo1, -posicion_y_m, 112);
+        imagen_pegar(cuadro, pasto_estirado, 0, 128);
+        imagen_pegar_con_paleta(cuadro, moto1, posicion_y_m, (224 - 10) / 2, paleta_4[2]);
+        
         // TODO: @EmilioBattista agregar la imagen de la moto
+        //imagen_t *fondo1 = generar_mosaico(rom, paleta_3, FONDO1_FILAS, FONDO1_COLUMNAS, fondo1_mosaico, fondo1_paleta);
+        //imagen_pegar(cuadro, fondo1, 0, 0);
+        //32768
         imagen_destruir(cuadrado);
 
         // Procedemos a dibujar a pantalla completa:
